@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block page-main %}
+
+    <div class="article_list">
+                {% for article in article_list %}
+                    <div class="article">
+                        <h1><a href="/blog/{{ article.user.username }}/article/{{ article.pk }}/">{{ article.title }}</a></h1>
+                        <div class="media">
+                            <div class="media-body">
+                                <p>{{ article.desc }}</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+            </div>
+{% endblock %}

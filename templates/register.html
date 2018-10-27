@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form action="" method="post" novalidate autocomplete="off" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+        {{ form.username }}
+        <span class="error"></span>
+    </div>
+    <div>
+        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+        {{ form.password }}
+        <span class="error"></span>
+    </div>
+    <div>
+        <label for="{{ form.re_password.id_for_label }}">{{ form.re_password.label }}</label>
+        {{ form.re_password }}
+        <span class="error"></span>
+    </div>
+    <div id="file">
+        <label for="avatar">头像 <img src="/static/image/avatars.jpg" id="img_avatar"></label>
+        <input accept="image/*" type="file" name="avatar" style="display:none" id="avatar">
+    </div>
+    <div>
+         <label for="{{ form.captcha.id_for_label }}">{{ form.captcha.label }}</label>
+        {{ form.captcha }}
+        <span id="id_captcha"></span>
+        <span class="error"></span>
+
+    </div>
+    <button type="button" class="c1" id="submit">注册</button>
+
+
+</form>
+
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script>
+
+$(".captcha").click(function(){
+        $.getJSON("/captcha/refresh/", function (result) {
+            $('.captcha').attr('src', result['image_url']);
+            $('#id_captcha_0').val(result['key'])
+        });
+
+
+    });
+$("#avatar").change(
+    function(){
+        var file_obj = new FileReader()
+        console.log(this.files[0])
+        file_obj.readAsDataURL(this.files[0])
+        file_obj.onload = function(){
+            $("#img_avatar").attr("src", file_obj.result)
+        }
+
+    }
+)
+$("#submit").click(function(){
+    console.log(999)
+
+     var formData = new FormData();
+        formData.append("username", $("#id_username").val());
+        formData.append("password", $("#id_password").val());
+        formData.append("re_password", $("#id_re_password").val());
+        formData.append("avatar", $("#avatar")[0].files[0]);
+        formData.append("captcha_1", $("#id_captcha_1").val());
+        formData.append("captcha_0", $("#id_captcha_0").val());
+        formData.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']").val());
+        console.log(formData)
+
+     $.ajax({
+            url: "/register/",
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: formData,
+            success:function (data) {
+                if (data.status){
+                    // 有错误就展示错误
+                    console.log(data.msg);
+                    // 将报错信息填写到页面上
+                    $.each(data.msg, function (k,v) {
+
+                        $("#id_"+k).next("span").text(v[0]);
+                    })
+
+                }else {
+                    // 没有错误就跳转到指定页面
+                    location.href = data.msg;
+                }
+            }
+        })
+
+
+})
+
+$("form input").focus(function () {
+    $(".error").text("");
+});
+
+
+
+
+
+</script>
+</body>
+
+</html>

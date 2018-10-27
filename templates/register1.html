@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form action="" method="post" novalidate enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+        {{ form.username }}
+        <span>{{ form.username.errors.0 }}</span>
+    </div>
+    <div>
+        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+        {{ form.password }}
+        <span>{{ form.password.errors.0 }}</span>
+    </div>
+    <div>
+        <label for="{{ form.re_password.id_for_label }}">{{ form.re_password.label }}</label>
+        {{ form.re_password }}
+        <span>{{ form.re_password.errors.0 }}</span>
+    </div>
+    <div id="avatar">
+        <label for="file">头像 <img src="/static/image/avatars.jpg" id="img_avatar"></label>
+        <input type="file" name="avatar" style="display:none" id="file">
+    </div>
+    <div>
+         <label for="{{ form.captcha.id_for_label }}">{{ form.captcha.label }}</label>
+        {{ form.captcha }}
+        <span>{{ form.captcha.errors.0 }}</span>
+
+    </div>
+    <input type="submit" class="c1" id="submit" value="注册">
+
+
+</form>
+
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script>
+
+$(".captcha").click(function(){
+        $.getJSON("/captcha/refresh/", function (result) {
+            $('.captcha').attr('src', result['image_url']);
+            $('#id_captcha_0').val(result['key'])
+        });
+
+
+    });
+$("#file").change(
+    function(){
+        var file_obj = new FileReader()
+        {#console.log(this.files[0])#}
+        file_obj.readAsDataURL(this.files[0])
+        file_obj.onload = function(){
+            $("#img_avatar").attr("src", file_obj.result)
+        }
+
+    }
+)
+
+
+
+
+
+</script>
+</body>
+
+</html>

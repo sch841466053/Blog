@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>博客标题</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/mystyle.css">
+    <link rel="stylesheet" href="/static/theme/{{ blog.theme }}">
+</head>
+<body>
+<div class="header">
+    <p>{{ blog.title }}</p>
+
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="panel panel-primary">
+                <div class="panel-heading">文章分类</div>
+                <div class="panel-body">
+                    {% for category in category_list %}
+                    <div>{{ category.title }}({{ category.c }})</div>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+            <div class="panel panel-info">
+                <div class="panel-heading">标签分类</div>
+                <div class="panel-body">
+                    {% for tag in tag_list %}
+                    <div>{{ tag.title }}({{ tag.c}})</div>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+        <div class="panel panel-warning">
+                <div class="panel-heading">日期归档</div>
+                <div class="panel-body">
+                    {% for archive in archive_list %}
+                    <div>{{ archive.archive_ym }}({{ archive.c}})</div>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-10">
+            {% block page-main %}
+
+            {% endblock %}
+        </div>
+
+    </div>
+</div>
+
+
+
+
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
