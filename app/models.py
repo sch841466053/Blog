@@ -9,7 +9,8 @@ class BlogUser(AbstractUser):
     博客用户信息表
     """
     phone = models.CharField(max_length=11, null=True, unique=True)
-    avatar = models.FileField(upload_to="avatars/", null=True)
+    email = models.EmailField(null=True)
+    avatar = models.FileField(upload_to="avatars/")
     blog = models.OneToOneField(to="Blog", to_field="nid", null=True)
     def __str__(self):
         return self.username
@@ -74,7 +75,7 @@ class Article(models.Model):
     nid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=50, verbose_name="文章标题")  # 文章标题
     desc = models.CharField(max_length=255)  # 文章描述
-    create_time = models.DateTimeField()  # 创建时间
+    create_time = models.DateTimeField(auto_now_add=True)  # 创建时间
 
     # 评论数
     comment_count = models.IntegerField(verbose_name="评论数", default=0)
@@ -105,7 +106,7 @@ class ArticleDetail(models.Model):
     """
     nid = models.AutoField(primary_key=True)
     content = models.TextField()
-    article = models.OneToOneField(to="Article", to_field="nid")
+    article = models.OneToOneField(to="Article", to_field="nid",related_name="articledetail")
 
     class Meta:
         verbose_name = "文章详情"

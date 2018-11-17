@@ -2,24 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>博客标题</title>
+    <title>{{ blog.title }}</title>
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/mystyle.css">
-    <link rel="stylesheet" href="/static/theme/{{ blog.theme }}">
+    {#    <link rel="stylesheet" href="/static/theme/{{ blog.theme }}">#}
 </head>
 <body>
-<div class="header">
-    <p>{{ blog.title }}</p>
 
-</div>
+{#<div class="header ">#}
+{#    <p>{{ blog.title }}</p>#}
+{#</div>#}
 <div class="container">
     <div class="row">
-        <div class="col-md-2">
+    {% if request.user.username == article.user.username %}
+         <div class="col-md-2">
+            <div class="panel panel-default"  style="margin-top:30px">
+                <div class="panel-heading">公告</div>
+                <div class="panel-body">
+                    <div>昵称: <a href="">{{ request.user.username }}</a></div>
+                    <div>园龄: <a href=""></a></div>
+                    <div> 粉丝:<a href=""></a></div>
+                    <div>关注: <a href=""></a></div>
+
+                </div>
+            </div>
             <div class="panel panel-primary">
                 <div class="panel-heading">文章分类</div>
                 <div class="panel-body">
                     {% for category in category_list %}
-                    <div>{{ category.title }}({{ category.c }})</div>
+                        <div>{{ category.title }}({{ category.c }})</div>
 
                     {% endfor %}
 
@@ -29,17 +40,17 @@
                 <div class="panel-heading">标签分类</div>
                 <div class="panel-body">
                     {% for tag in tag_list %}
-                    <div>{{ tag.title }}({{ tag.c}})</div>
+                        <div>{{ tag.title }}({{ tag.c }})</div>
 
                     {% endfor %}
 
                 </div>
             </div>
-        <div class="panel panel-warning">
+            <div class="panel panel-warning">
                 <div class="panel-heading">日期归档</div>
                 <div class="panel-body">
                     {% for archive in archive_list %}
-                    <div>{{ archive.archive_ym }}({{ archive.c}})</div>
+                        <div>{{ archive.archive_ym }}({{ archive.c }})</div>
 
                     {% endfor %}
 
@@ -47,6 +58,52 @@
             </div>
 
         </div>
+    {% else %}
+        <div class="col-md-2">
+            <div class="panel panel-default"  style="margin-top:30px">
+                <div class="panel-heading">导航</div>
+                <div class="panel-body">
+                    <div>昵称: <a href="">{{ article.user.username }}</a></div>
+                    <div>园龄: <a href=""></a></div>
+                    <div> 粉丝:<a href=""></a></div>
+                    <div>关注: <a href=""></a></div>
+
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">随笔分类</div>
+                <div class="panel-body">
+                    {% for category in category_list %}
+                        <div>{{ category.title }}({{ category.c }})</div>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+            <div class="panel panel-info">
+                <div class="panel-heading">标签分类</div>
+                <div class="panel-body">
+                    {% for tag in tag_list %}
+                        <div>{{ tag.title }}({{ tag.c }})</div>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+            <div class="panel panel-warning">
+                <div class="panel-heading">日期归档</div>
+                <div class="panel-body">
+                    {% for archive in archive_list %}
+                        <div>{{ archive.archive_ym }}({{ archive.c }})</div>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
+
         <div class="col-md-10">
             {% block page-main %}
 
@@ -55,8 +112,6 @@
 
     </div>
 </div>
-
-
 
 
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>

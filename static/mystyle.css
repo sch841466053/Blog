@@ -111,3 +111,17 @@ input.author{
 .list-group-item .con{
     margin-top: 10px;
 }
+
+
+.comment_tree .comment_item{
+    margin-left: 20px;
+}
+
+.c1{
+
+    border: 1px dotted #8B8D72;
+    padding: 20px;
+    color: #7B7D62;
+    margin-bottom: 20px;
+
+}

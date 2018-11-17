@@ -8,13 +8,35 @@ from app import models
 from geetest import GeetestLib
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
+from django.conf import settings
 # Create your views here.
-
+from utils.open_email_active.sendemail import send_email
+from utils.page import Pagination
 
 def Index(request):
-    article_list = models.Article.objects.all()
-    return render(request, "index.html",{"article_list": article_list})
+    category_list = models.Category.objects.all()
+    current_page=request.GET.get("page",1)
 
+    all_count=models.Article.objects.all().count()
+    print(all_count)
+    base_url=request.path  # /index/
+    pagination = Pagination(int(current_page),all_count, base_url, request.GET, per_page_num=3, pager_count=6)
+    article_list = models.Article.objects.all()[pagination.start:pagination.end]
+    return render(request, "index.html",locals())
+
+
+def Select(request,id):
+    category_list = models.Category.objects.all()
+    current_page = request.GET.get("page", 1)
+    category = models.Category.objects.filter(nid=id).first()
+    # article_list = models.Article.objects.filter(category=category)
+
+    all_count=models.Article.objects.filter(category=category).count()
+    print(all_count)
+    base_url=request.path  # /index/
+    pagination = Pagination(int(current_page),all_count, base_url, request.GET, per_page_num=3, pager_count=6)
+    article_list = models.Article.objects.filter(category=category)[pagination.start:pagination.end]
+    return render(request, "index.html",locals())
 
 #form 表单提交数据
 
@@ -45,10 +67,17 @@ def Register(request):
             # 帮我做校验
             if form.is_valid():
                 # 校验通过，去数据库创建一个新的用户
+                email = request.POST.get("email")
+                phone = request.POST.get("phone")
                 username = request.POST.get("username")
                 password = request.POST.get("password")
-                avatar = request.FILES.get("avatar")
-                user = models.BlogUser.objects.create_user(username=username, password=password,avatar=avatar)
+                avatar = request.FILES.get("avatar","avatars/timg.jpg")
+                # 发送激活邮件
+                send_email(email)
+                # 数据可创建一个新用户
+                user = models.BlogUser.objects.create_user(username=username, password=password,avatar=avatar,email=email)
+
+
                 ret["msg"] = "/login/"
                 return JsonResponse(ret)
             else:
@@ -167,6 +196,7 @@ def home(request, username):
     article_list = models.Article.objects.filter(user=user)
     category_list, tag_list, archive_list = get_left_menu(username)
     return render(request, "home.html", {
+        "user":user,
         "blog":blog,
         "article_list":article_list,
         "category_list": category_list,
@@ -236,10 +266,121 @@ def comment(request):
     else:
         comment_obj=models.Comment.objects.create(article_id=article_id,user_id=user_pk,content=content,parent_comment_id=pid)
 
-
+    comment_count = models.Article.objects.get(nid=article_id).comment_count + 1
+    models.Article.objects.filter(nid=article_id).update(comment_count=comment_count)
 
     response["create_time"]=comment_obj.create_time.strftime("%Y-%m-%d")
     response["content"]=comment_obj.content
     response["username"]=comment_obj.user.username
 
     return JsonResponse(response)
+
+
+def comment_tree(request,article_id):
+
+    ret=list(models.Comment.objects.filter(article_id=article_id).values("pk","content","parent_comment_id"))
+    print(ret)
+    return JsonResponse(ret,safe=False)
+
+
+def add_article(request):
+
+    if request.method=="POST":
+        title=request.POST.get('title')
+        article_content=request.POST.get('article_content')
+        user=request.user
+
+        from bs4 import BeautifulSoup
+
+        bs=BeautifulSoup(article_content,"html.parser")
+        desc=bs.text[0:150]+"..."
+
+
+        # 过滤非法标签
+        for tag in bs.find_all():
+
+            print(tag.name)
+
+            if tag.name in ["script", "link"]:
+                tag.decompose()
+
+        article_obj=models.Article.objects.create(user=user,title=title,desc=desc)
+        models.ArticleDetail.objects.create(content=str(bs),article=article_obj)
+
+
+        return redirect("/index/")
+
+
+
+
+    return render(request,"add_article.html")
+
+
+def edit_article(request,id):
+
+    if request.method=="POST":
+        article = models.Article.objects.filter(nid=id)
+        title=request.POST.get('title')
+        article_content=request.POST.get('article_content')
+        user=request.user
+
+        from bs4 import BeautifulSoup
+
+        bs=BeautifulSoup(article_content,"html.parser")
+        desc=bs.text[0:150]+"..."
+
+
+        # 过滤非法标签
+        for tag in bs.find_all():
+
+            print(tag.name)
+
+            if tag.name in ["script", "link"]:
+                tag.decompose()
+
+        article_obj=article.update(user=user,title=title,desc=desc)
+        article_detail_obj = article.first().articledetail
+
+        article_detail_obj.content = str(bs)
+        article_detail_obj.article = article.first()
+        article_detail_obj.save()
+
+
+        return redirect("/index/")
+
+    article = models.Article.objects.filter(nid=id).first()
+    return render(request,"edit_article.html",{"article":article})
+
+import os
+def upload(request):
+    print(request.FILES)
+    obj = request.FILES.get("upload_img")
+
+    print("name",obj.name)
+
+    path=os.path.join(settings.MEDIA_ROOT,"article_img",obj.name)
+
+    with open(path,"wb") as f:
+        for line in obj:
+            f.write(line)
+
+
+    res={
+        "error":0,
+        "url":"/media/article_img/"+obj.name
+    }
+
+
+    return HttpResponse(json.dumps(res))
+
+
+from utils.get_phone_code.default import sendTemplateSMS
+def get_phone_code(request):
+    ret = {"code": 10000}
+    phone = request.POST.get("phone")
+    print(phone,type(phone))
+    s = sendTemplateSMS(phone,'',1)
+    print(s)
+    return JsonResponse(ret)
+
+

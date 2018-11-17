@@ -2,28 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>登陆</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <style>
+        #white {
+            background-color: white;
+            margin-top: 60px;
+            margin-left: 500px;
+            height: 400px;
+            width: 400px;
+        }
+
+        body {
+            background-color: #eee;
+        }
+        .form{
+            padding:50px
+
+
+        }
+    </style>
+
+
 </head>
 <body>
-<form action="" method="post">
-    {% csrf_token%}
-    <div>
-        <label for="user">用户名</label>
-        <input type="text" id="user" placeholder="请输入用户名" name="username">
-    </div>
-    <div>
-        <label for="pwd">密码</label>
-        <input type="password" id="pwd" placeholder="请输入密码" name="password">
-    </div>
+<div id="white">
+    <form action="" method="post" class="form">
+        {% csrf_token %}
+        <div class="form-group">
+            <div id="Heading" style="color:red;font-size: 17px" class="row">
+                <div class="col-xs-10">
+                    登录博客园 - 代码改变世界
+                </div>
+            </div>
 
-    <div id="popup-captcha"></div>
-    <div>
-        <button type="button" id="popup-submit">登陆</button>
-         <span class="login-error"></span>
+        </div>
+        <div class="form-group">
 
+            <label for="user">用户名</label>
+            <div class="row">
+                <div class="col-xs-10">
+                    <input type="text" id="user" placeholder="请输入用户名" name="username" class="form-control">
+                </div>
+
+            </div>
+
+
+        </div>
+        <div class="form-group">
+
+            <label for="pwd">密码</label>
+            <div class="row">
+                <div class="col-xs-10">
+                    <input type="password" id="pwd" placeholder="请输入密码" name="password" class="form-control">
+                </div>
+
+            </div>
+        </div>
+
+        <div id="popup-captcha"></div>
+        <div class="form-group">
+            <button type="button" id="popup-submit" class="btn btn-primary">登陆</button>
+            <span class="login-error"></span>
+
+        </div>
+
+    </form>
+
+    <div class="col-md-offset-3">
+        <p>示例账号：shang</p>
+        <p>密码：shang123</p>
     </div>
+</div>
 
-</form>
 <script src="http://static.geetest.com/static/tools/gt.js"></script>
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script>
@@ -45,7 +96,7 @@
                     geetest_seccode: validate.geetest_seccode
                 },
                 success: function (data) {
-                  console.log(data);
+                    console.log(data);
                     if (data.status) {
                         // 有错误，在页面上提示
                         $(".login-error").text(data.msg);

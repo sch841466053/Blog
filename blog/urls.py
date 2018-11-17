@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^captcha/', include('captcha.urls')),
     url(r'^index/', views.Index),
+    url(r'^select/(\d*)', views.Select),
     url(r'^login/', views.Login),
     url(r'^logout/', views.Logout),
     url(r'^modify_password/', views.Modify_Password),
@@ -30,6 +31,7 @@ urlpatterns = [
     url(r'^register/', views.Register),
     url(r'^pc-geetest/register', views.get_geetest),
     url(r'^blog/', include("app.urls")),
+    url(r'^upload/', views.upload),
 
 
 # media相关的路由设置
