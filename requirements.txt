@@ -32,6 +32,6 @@ six==1.11.0
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 SQLAlchemy==1.2.11
-urllib3==1.23
+urllib3==1.26.5
 Werkzeug==0.14.1
 WTForms==2.2.1
